@@ -11,13 +11,13 @@
         .username(v-else) загрузка...
       el-form
         el-form-item
-          el-select(v-model="selectedOrgId", clearable, placeholder="Организация")
+          el-select(v-model="selectedOrgId", clearable, filterable, placeholder="Организация")
             el-option(v-for="org in userorganizations",
             :key="org.id",
             :label="org.name",
             :value="org.id")
         el-form-item
-          el-select(v-model="selectedFieldId", clearable, placeholder="Выберите поле...")
+          el-select(v-model="selectedFieldId", clearable, filterable, placeholder="Выберите поле...")
             el-option(v-for="field in fields",
                       :key="field.id",
                       :label="field.newName",
