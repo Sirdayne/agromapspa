@@ -4,11 +4,24 @@
     .sidebar(:class="{ 'active' : showSideBar }")
       .top-line
         i.el-icon-close.close-left(@click="closeSideBars()")
+        .top-line-menu Меню
+      .menu-row(@click="closeSideBars()")
+        router-link(to="/")
+          el-button(type="primary") Карта
+      .menu-row(@click="closeSideBars()")
+        router-link(to="/notepad")
+          el-button(type="primary") Блокнот
+      .menu-row(@click="closeSideBars()")
+        router-link(to="/anketa")
+          el-button(type="primary") Анкеты
+      .menu-row(@click="closeSideBars()")
+        router-link(to="/checklists")
+          el-button(type="primary") Чек-листы
     .second-bar(:class="{ 'active' : showSecondBar }")
       .top-line
         i.el-icon-close.close-right(@click="closeSideBars()")
-        .username(v-if="userinfo") {{ userinfo.fullName }}
-        .username(v-else) загрузка...
+        .top-line-username(v-if="userinfo") {{ userinfo.fullName }}
+        .utop-line-sername(v-else) загрузка...
       el-form
         el-form-item
           el-select(v-model="selectedOrgId", clearable, filterable, placeholder="Организация")
@@ -22,7 +35,12 @@
                       :key="field.id",
                       :label="field.newName",
                       :value="field.id")
-
+        el-form-item
+          el-select(v-model="selectedYear", clearable, filterable, placeholder="Год")
+            el-option(v-for="year in years",
+            :key="year",
+            :label="year",
+            :value="year")
 
     .overlay-dark(:class="{ 'active' : showSideBar || showSecondBar}", @click="closeSideBars()")
     router-view
@@ -33,16 +51,16 @@
 import topmenu from '@/components/topmenu'
 import {EventBus} from '@/services/EVentBus'
 import http from '@/services/httpQuery'
-import ElForm from "../node_modules/element-ui/packages/form/src/form.vue";
+import moment from 'moment'
 
 export default {
   name: 'App',
   components: {
-    ElForm,
     topmenu
   },
   data () {
     return {
+      selectedYear: null,
       selectedFieldId: null,
       selectedOrgId: null,
       fields: [],
@@ -63,8 +81,16 @@ export default {
     EventBus.$on('openSecondBar', () => {
       this.showSecondBar = true
     });
+    EventBus.$on('closeSideBars', () => {
+      this.closeSideBars()
+    });
   },
   computed: {
+    years() {
+      let year = (new Date).getFullYear();
+      let years = [year - 4, year - 3, year - 2, year - 1, year, year + 1, year + 2]
+      return years
+    },
     orgId() {
       return this.$store.getters.getOrganizationId
     },
