@@ -1,11 +1,13 @@
 <template lang="pug">
   #app
     topmenu
-    .overlay-dark(:class="{ 'active' : showSideBar || showSecondBar}", @click="closeSideBars()")
     .sidebar(:class="{ 'active' : showSideBar }")
-      i.el-icon-close(@click="closeSideBars()")
+      .top-line
+        i.el-icon-close.close-left(@click="closeSideBars()")
     .second-bar(:class="{ 'active' : showSecondBar }")
-      i.el-icon-close(@click="closeSideBars()")
+      .top-line
+        i.el-icon-close.close-right(@click="closeSideBars()")
+    .overlay-dark(:class="{ 'active' : showSideBar || showSecondBar}", @click="closeSideBars()")
     router-view
 </template>
 

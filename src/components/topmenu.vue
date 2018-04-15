@@ -1,5 +1,5 @@
 <template lang="pug">
-.top-menu
+.top-menu.blue
   .burger(@click="openSideBar()")
     .bline.bl-1
     .bline.bl-2
