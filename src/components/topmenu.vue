@@ -1,12 +1,12 @@
 <template lang="pug">
 .top-menu
-  .burger
+  .burger(@click="openSideBar()")
     .bline.bl-1
     .bline.bl-2
     .bline.bl-3
   h1 Agro
     span map
-  .second-menu
+  .second-menu(@click="openSecondBar()")
     i.el-icon-menu
 </template>
 
@@ -22,10 +22,11 @@ export default {
     }
   },
   methods: {
-    btnClick() {
-      this.num = this.num + 1
-      this.$store.dispatch('actionSetOrganizationId', this.num);
-      EventBus.$emit('btnClicked', this.num);
+    openSideBar() {
+      EventBus.$emit('openSideBar');
+    },
+    openSecondBar(){
+      EventBus.$emit('openSecondBar');
     }
   }
 }

@@ -15,11 +15,6 @@ export default {
       msg: 'Agromap'
     }
   },
-  computed: {
-    orgId() {
-      return this.$store.getters.getOrganizationId
-    },
-  },
   created() {
     EventBus.$on('btnClicked', (msg) => {
       console.log(msg)
