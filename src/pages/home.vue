@@ -1,22 +1,14 @@
 <template lang="pug">
-div
-  topmenu
-  h1
-  p {{orgId}}
-  p(v-for="field in fields") {{field.newName}}
+.container Hello, world!
 </template>
 
 <script>
 
-import topmenu from '@/components/topmenu'
 import {EventBus} from '@/services/EVentBus'
 import http from '@/services/httpQuery'
 
 export default {
   name: 'home',
-  components: {
-    topmenu
-  },
   data () {
     return {
       fields: [],
