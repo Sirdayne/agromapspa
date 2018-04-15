@@ -2,6 +2,11 @@
 
 > agromap
 
+config/index.js
+assetsPublicPath: '/',
+changed for cordova
+assetsPublicPath: '',
+
 ## Build Setup
 
 ``` bash
