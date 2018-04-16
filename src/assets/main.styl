@@ -9,12 +9,13 @@
   -webkit-focus-ring-color rgba(0, 0, 0, 0)
 
 .top-menu
-  float left
+  position fixed
   width 100%
   height 50px
   padding 10px 20px
   box-sizing border-box
   background #324057
+  z-index 248
   h1
     float left
     width calc(100% - 50px)
@@ -59,7 +60,7 @@
     display inline-block
 
 .overlay-dark
-  position absolute
+  position fixed
   display none
   top 0px
   left 0px
@@ -72,7 +73,7 @@
     display block
 
 .sidebar, .second-bar
-  position absolute
+  position fixed
   top 0px
   width 240px
   padding 0 20px 10px
@@ -82,7 +83,6 @@
   transition .3s linear
   outline: none
   z-index 250
-
 
 .sidebar
   left -240px
@@ -138,15 +138,17 @@
 .workspace
   float left
   width 100%
+  margin-top 50px
 
 .container
   float left
   width 100%
+  margin-top 50px
   box-sizing border-box
   padding 20px
 
 #map
-  min-height 100vh
+  min-height calc(100vh - 50px)
   z-index 100
 
 
