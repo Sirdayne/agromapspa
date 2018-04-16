@@ -1,6 +1,16 @@
 import axios from 'axios';
+import { Message } from 'element-ui';
 
 const AUTH_TOKEN = 'Bearer '+'U4dijzaHALmHLZc2PinuVJygMWXNbGATMgJjg59kWa8Gn1EN1utfn3joMpsILSIU-maHXTezvWWgh1_Zw_U-1yNwRXd6U_P32fzF9l8Qu7PH70rGl9D6texLO6-hnQyUTE8ARZme6Pyi7PYZYkBnGXe7BnMeejQFPopVzEB85C9PEMe_2p_mpvl-NJVB9BEnR4-G_rPna_d2w8e_XXXkT5qTAhQkFfGVSZDgpoK7ais9k1eRvBz35i3zZSkvNnGh-GJPbhp_GW9_NgqE32E50LC_-zDHkhGEDDmPR1fYo5T3j-dTlmJaP-NRy4CyhzkgfORB5uUlbD4jCm96ucSWS6KM6zmYkUBY-qQFvmWrnY-rmHonRwsU6-oJCX-pHMFQEEAAintNg6KhA-5Im5Rjy_IIbDgNOhVXgU2Nb9q4xjclmQ9Q0g_DzzWBRMtEHb9-r5vlmoMjdo-hz-JGG65mVl9D8ZOwKgS3emHXrIk-FQZq3HAPqPymZw9m_8yAP6015CyEkoAtQKjwWy6a0xb9mpAKF3Z3SAv302r8wn2dqNw';
+
+let apiToken = axios.create({
+  baseURL: 'http://agroplanapi-test.azurewebsites.net/',
+  timeout: 180000,
+  responseType: 'json',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  }
+});
 
 let api = axios.create({
   baseURL: 'http://agroplanapi-test.azurewebsites.net/api/',
@@ -14,13 +24,30 @@ let api = axios.create({
 api.defaults.headers.common['Authorization'] = AUTH_TOKEN;
 
 export default{
-  get (path) {
+  get(path) {
     return api.get(path)
-      .then(function(response) {
+      .then((response) => {
         return response.data;
       })
-      .catch(function (error) {
-
+      .catch((error) => {
+        this.showError()
       });
+  },
+  postToken(path, data) {
+    return apiToken.post(path, data)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        this.showError()
+      });
+  },
+  showError() {
+    Message({
+      message: 'Ошибка',
+      type: "error",
+      duration: 5000,
+      showClose: true,
+    });
   }
 }

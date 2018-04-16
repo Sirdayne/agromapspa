@@ -51,10 +51,10 @@
       .login-img
         img(src="@/assets/logo.png")
         p Логин
-        el-input(v-model="login")
+        el-input(v-model="inputLogin")
         p Пароль
-        el-input(v-model="password", type="password")
-        el-button(type="primary", @click="userLogin()") войти
+        el-input(v-model="inputPassword", type="password")
+        el-button(type="primary", @click="userLogin()", :loading="loadingLogin") войти
 
 </template>
 
@@ -75,8 +75,8 @@ export default {
   data () {
     return {
       logged: false,
-      login: null,
-      password: null,
+      inputLogin: null,
+      inputPassword: null,
       selectedYear: null,
       selectedFieldId: null,
       selectedOrgId: null,
@@ -85,6 +85,7 @@ export default {
       userinfo: null,
       showSideBar: false,
       showSecondBar: false,
+      loadingLogin: false,
     }
   },
   created() {
@@ -118,9 +119,18 @@ export default {
       this.showSideBar = false
     },
     userLogin() {
-      this.logged = true
+      this.loadingLogin = true
+      http.postToken('token', `userName=${this.inputLogin}&password=${this.inputPassword}&grant_type=password`)
+        .then(data => {
+          this.loadingLogin = false
+          if (data && data.access_token){
+            localStorage.setItem('token', data.access_token)
+            this.logged = true
+          }
+        })
     },
     userLogout() {
+      this.closeSideBars()
       this.logged = false
     },
   },
