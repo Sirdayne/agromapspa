@@ -1,49 +1,61 @@
 <template lang="pug">
   #app
-    topmenu
-    .sidebar(:class="{ 'active' : showSideBar }")
-      .top-line
-        i.el-icon-close.close-left(@click="closeSideBars()")
-        .top-line-menu Меню
-      .menu-row(@click="closeSideBars()")
-        router-link(to="/")
-          el-button(type="primary") Карта
-      .menu-row(@click="closeSideBars()")
-        router-link(to="/notepad")
-          el-button(type="primary") Блокнот
-      .menu-row(@click="closeSideBars()")
-        router-link(to="/anketa")
-          el-button(type="primary") Анкеты
-      .menu-row(@click="closeSideBars()")
-        router-link(to="/checklists")
-          el-button(type="primary") Чек-листы
-    .second-bar(:class="{ 'active' : showSecondBar }")
-      .top-line
-        i.el-icon-close.close-right(@click="closeSideBars()")
-        .top-line-username(v-if="userinfo") {{ userinfo.fullName }}
-        .utop-line-sername(v-else) загрузка...
-      el-form
-        el-form-item
-          el-select(v-model="selectedOrgId", clearable, filterable, placeholder="Организация")
-            el-option(v-for="org in userorganizations",
-            :key="org.id",
-            :label="org.name",
-            :value="org.id")
-        el-form-item
-          el-select(v-model="selectedFieldId", clearable, filterable, placeholder="Выберите поле...")
-            el-option(v-for="field in fields",
-                      :key="field.id",
-                      :label="field.newName",
-                      :value="field.id")
-        el-form-item
-          el-select(v-model="selectedYear", clearable, filterable, placeholder="Год")
-            el-option(v-for="year in years",
-            :key="year",
-            :label="year",
-            :value="year")
+    #app-container(v-if="logged")
+      topmenu
+      .sidebar(:class="{ 'active' : showSideBar }")
+        .top-line
+          i.el-icon-close.close-left(@click="closeSideBars()")
+          .top-line-menu Меню
+        .menu-row(@click="closeSideBars()")
+          router-link(to="/")
+            el-button(type="primary") Карта
+        .menu-row(@click="closeSideBars()")
+          router-link(to="/notepad")
+            el-button(type="primary") Блокнот
+        .menu-row(@click="closeSideBars()")
+          router-link(to="/anketa")
+            el-button(type="primary") Анкеты
+        .menu-row(@click="closeSideBars()")
+          router-link(to="/checklists")
+            el-button(type="primary") Чек-листы
+      .second-bar(:class="{ 'active' : showSecondBar }")
+        .top-line
+          i.el-icon-close.close-right(@click="closeSideBars()")
+          .top-line-username(v-if="userinfo") {{ userinfo.fullName }}
+          .utop-line-sername(v-else) загрузка...
+        el-form
+          el-form-item
+            el-select(v-model="selectedOrgId", clearable, filterable, placeholder="Организация")
+              el-option(v-for="org in userorganizations",
+              :key="org.id",
+              :label="org.name",
+              :value="org.id")
+          el-form-item
+            el-select(v-model="selectedFieldId", clearable, filterable, placeholder="Выберите поле...")
+              el-option(v-for="field in fields",
+                        :key="field.id",
+                        :label="field.newName",
+                        :value="field.id")
+          el-form-item
+            el-select(v-model="selectedYear", clearable, filterable, placeholder="Год")
+              el-option(v-for="year in years",
+              :key="year",
+              :label="year",
+              :value="year")
+        .bottom-line
+          el-button(@click="userLogout()") выйти
 
-    .overlay-dark(:class="{ 'active' : showSideBar || showSecondBar}", @click="closeSideBars()")
-    router-view
+      .overlay-dark(:class="{ 'active' : showSideBar || showSecondBar}", @click="closeSideBars()")
+      router-view
+    #login(v-else)
+      .login-img
+        img(src="@/assets/logo.png")
+        p Логин
+        el-input(v-model="login")
+        p Пароль
+        el-input(v-model="password", type="password")
+        el-button(type="primary", @click="userLogin()") войти
+
 </template>
 
 <script>
@@ -52,14 +64,19 @@ import topmenu from '@/components/topmenu'
 import {EventBus} from '@/services/EVentBus'
 import http from '@/services/httpQuery'
 import moment from 'moment'
+import ElButton from "../node_modules/element-ui/packages/button/src/button.vue";
 
 export default {
   name: 'App',
   components: {
+    ElButton,
     topmenu
   },
   data () {
     return {
+      logged: false,
+      login: null,
+      password: null,
       selectedYear: null,
       selectedFieldId: null,
       selectedOrgId: null,
@@ -99,7 +116,13 @@ export default {
     closeSideBars() {
       this.showSecondBar = false
       this.showSideBar = false
-    }
+    },
+    userLogin() {
+      this.logged = true
+    },
+    userLogout() {
+      this.logged = false
+    },
   },
 }
 </script>
