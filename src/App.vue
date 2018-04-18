@@ -2,22 +2,7 @@
   #app
     #app-container(v-if="logged")
       topmenu
-      .sidebar(:class="{ 'active' : showSideBar }")
-        .top-line
-          i.el-icon-close.close-left(@click="closeSideBars()")
-          .top-line-menu Меню
-        .menu-row(@click="closeSideBars()")
-          router-link(to="/")
-            el-button(type="primary") Карта
-        .menu-row(@click="closeSideBars()")
-          router-link(to="/notepad")
-            el-button(type="primary") Блокнот
-        .menu-row(@click="closeSideBars()")
-          router-link(to="/anketa")
-            el-button(type="primary") Анкеты
-        .menu-row(@click="closeSideBars()")
-          router-link(to="/checklists")
-            el-button(type="primary") Чек-листы
+      sidebar(:class="{ 'active' : showSideBar }")
       .second-bar(:class="{ 'active' : showSecondBar }")
         .top-line
           i.el-icon-close.close-right(@click="closeSideBars()")
@@ -25,23 +10,30 @@
           .utop-line-sername(v-else) загрузка...
         el-form
           el-form-item
-            el-select(v-model="selectedOrgId", clearable, filterable, placeholder="Организация")
+            el-select(v-model="context.field", clearable, filterable, placeholder="Выберите поле...")
+              el-option(v-for="field in fields",
+              :key="field.id",
+              :label="field.newName",
+              :value="field.id")
+          el-form-item
+            el-select(v-model="context.year", clearable, filterable, placeholder="Год")
+              el-option(v-for="year in years",
+              :key="year",
+              :label="year",
+              :value="year")
+          el-form-item
+            el-select(v-model="context.organization", clearable, filterable, placeholder="Организация")
               el-option(v-for="org in userorganizations",
               :key="org.id",
               :label="org.name",
               :value="org.id")
           el-form-item
-            el-select(v-model="selectedFieldId", clearable, filterable, placeholder="Выберите поле...")
-              el-option(v-for="field in fields",
-                        :key="field.id",
-                        :label="field.newName",
-                        :value="field.id")
-          el-form-item
-            el-select(v-model="selectedYear", clearable, filterable, placeholder="Год")
-              el-option(v-for="year in years",
-              :key="year",
-              :label="year",
-              :value="year")
+            el-select(v-model="context.budget", clearable, filterable, placeholder="Бюджет")
+              el-option(v-for="budget in budgets",
+              :key="budget.id",
+              :label="budget.name",
+              :value="budget.id")
+
         .bottom-line
           el-button(@click="userLogout()") выйти
 
@@ -60,39 +52,41 @@
 
 <script>
 
-import topmenu from '@/components/topmenu'
 import {EventBus} from '@/services/EVentBus'
 import http from '@/services/httpQuery'
 import moment from 'moment'
-import ElButton from "../node_modules/element-ui/packages/button/src/button.vue";
+
+import topmenu from '@/components/topmenu'
+import sidebar from '@/components/sidebar'
 
 export default {
   name: 'App',
   components: {
-    ElButton,
-    topmenu
+    topmenu,
+    sidebar
   },
   data () {
     return {
       logged: false,
       inputLogin: null,
       inputPassword: null,
-      selectedYear: null,
-      selectedFieldId: null,
-      selectedOrgId: null,
       fields: [],
       userorganizations: [],
+      budgets: [],
       userinfo: null,
       showSideBar: false,
       showSecondBar: false,
       loadingLogin: false,
+      context: {
+        year: null,
+        organization: null,
+        field: null,
+        budget: null,
+      },
     }
   },
   created() {
-    http.get('/account/userinfo/').then(data => { this.userinfo = data })
-    http.get('/userorganizations').then(data => { this.userorganizations = data })
-    http.get('/fields/1').then(data => { this.fields = data })
-    //this.$store.dispatch('actionSetOrganizationId', this.num);
+    this.checkToken()
     EventBus.$on('openSideBar', () => {
       this.showSideBar = true
     });
@@ -102,6 +96,14 @@ export default {
     EventBus.$on('closeSideBars', () => {
       this.closeSideBars()
     });
+  },
+  watch: {
+    ['context.budget'](val, oldVal) {
+      localStorage.setItem('agromap.context.budget', val)
+    },
+    ['context.organization'](val, oldVal) {
+      localStorage.setItem('agromap.context.organization', val)
+    },
   },
   computed: {
     years() {
@@ -118,21 +120,64 @@ export default {
       this.showSecondBar = false
       this.showSideBar = false
     },
+    checkToken(){
+      let token = localStorage.getItem('agromap.token')
+      if (token) {
+        this.logged = true
+        this.getUserInfo()
+        this.getContextOrganization()
+        this.getContextBudget()
+      }
+    },
     userLogin() {
       this.loadingLogin = true
       http.postToken('token', `userName=${this.inputLogin}&password=${this.inputPassword}&grant_type=password`)
         .then(data => {
           this.loadingLogin = false
           if (data && data.access_token){
-            localStorage.setItem('token', data.access_token)
-            this.logged = true
+            localStorage.setItem('agromap.token', `Bearer ${data.access_token}`)
+            this.checkToken()
           }
         })
     },
     userLogout() {
       this.closeSideBars()
+      localStorage.removeItem('agromap.token')
       this.logged = false
     },
+    getUserInfo() {
+      http.get('/account/userinfo/').then(data => { this.userinfo = data })
+    },
+    getContextOrganization() {
+      let organization = localStorage.getItem('agromap.context.organization')
+      http.get('/userorganizations').then(data => {
+        this.userorganizations = data;
+        if (data && !organization){
+          this.context.organization = data[0].id
+          localStorage.setItem('agromap.context.organization', data[0].id)
+        }
+      })
+      if (organization) {
+        this.context.organization = organization
+        this.loading = false
+      }
+    },
+    getContextBudget() {
+      let budget = localStorage.getItem('agromap.context.budget')
+      http.get('/budgets').then(data => {
+        this.budgets = data;
+        if (data && !budget){
+          this.context.budget = data[0].id
+          localStorage.setItem('agromap.context.budget', data[0].id)
+        }
+      })
+      if (budget) {
+        this.context.budget = budget
+      }
+    },
+    getData() {
+      http.get(`/fields/${context.organization}`).then(data => { this.fields = data })
+    }
   },
 }
 </script>
