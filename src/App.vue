@@ -52,8 +52,8 @@
 
 <script>
 
-import {EventBus} from '@/services/EVentBus'
-import http from '@/services/httpQuery'
+import {EventBus} from '@/services/EventBus'
+import http from '@/services/httpQuery.js'
 import moment from 'moment'
 
 import topmenu from '@/components/topmenu'

@@ -6,8 +6,8 @@
 
 <script>
 
-import {EventBus} from '@/services/EVentBus'
-import http from '@/services/httpQuery'
+import {EventBus} from '@/services/EventBus'
+import http from '@/services/httpQuery.js'
 
 export default {
   name: 'notepad',

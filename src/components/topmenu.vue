@@ -12,7 +12,7 @@
 
 <script>
 
-import {EventBus} from '@/services/EVentBus'
+import {EventBus} from '@/services/EventBus'
 
 export default {
   name: 'headerMenu',

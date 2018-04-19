@@ -9,8 +9,8 @@ import L from 'leaflet'
 import 'leaflet-providers'
 import 'leaflet/dist/leaflet.css'
 
-import {EventBus} from '@/services/EVentBus'
-import http from '@/services/httpQuery'
+import {EventBus} from '@/services/EventBus'
+import http from '@/services/httpQuery.js'
 
 export default {
   name: 'home',
