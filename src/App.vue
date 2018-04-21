@@ -10,19 +10,19 @@
           .utop-line-sername(v-else) загрузка...
         el-form
           el-form-item
-            el-select(v-model="context.field", clearable, filterable, placeholder="Выберите поле...")
+            el-select(v-model="context.field", clearable, filterable, size="small", placeholder="Выберите поле...")
               el-option(v-for="field in fields",
               :key="field.id",
               :label="field.newName",
               :value="field.id")
           el-form-item
-            el-select(v-model="context.year", clearable, filterable, placeholder="Год")
+            el-select(v-model="context.year", clearable, filterable, size="small", placeholder="Год")
               el-option(v-for="year in years",
               :key="year",
               :label="year",
               :value="year")
           el-form-item
-            el-select(v-model="context.organization", placeholder="Организация")
+            el-select(v-model="context.organization", clearable, filterable, size="small", placeholder="Организация")
               el-option(
                 v-for="org in userorganizations",
                 :label="org.name",
@@ -30,14 +30,15 @@
                 :key="org.id"
               )
           el-form-item
-            el-select(v-model="context.budget", placeholder="Бюджет")
+            el-select(v-model="context.budget", clearable, filterable, size="small", placeholder="Бюджет")
               el-option(v-for="budget in budgets",
               :key="budget.id",
               :label="budget.name",
               :value="budget.id")
 
         .bottom-line
-          el-button(@click="userLogout()") выйти
+          el-button(size="small", @click="clearCache()") очистить БД
+          el-button(size="small", type="primary", @click="userLogout()") выйти
 
       .overlay-dark(:class="{ 'active' : showSideBar || showSecondBar}", @click="closeSideBars()")
       router-view
@@ -101,11 +102,18 @@ export default {
     });
   },
   watch: {
+    ['context.organization'](val, oldVal) {
+      localStorage.setItem('agromap.context.organization', val)
+      this.removeContextField()
+    },
     ['context.budget'](val, oldVal) {
       localStorage.setItem('agromap.context.budget', val)
     },
-    ['context.organization'](val, oldVal) {
-      localStorage.setItem('agromap.context.organization', val)
+    ['context.field'](val, oldVal) {
+      localStorage.setItem('agromap.context.field', val)
+    },
+    ['context.year'](val, oldVal) {
+      localStorage.setItem('agromap.context.year', val)
     },
   },
   computed: {
@@ -128,6 +136,7 @@ export default {
       if (token) {
         this.logged = true
         this.getUserInfo()
+        this.getContextYear()
         this.getContextOrganization()
         this.getContextBudget()
       }
@@ -151,6 +160,15 @@ export default {
     getUserInfo() {
       http.get('/account/userinfo/').then(data => { this.userinfo = data })
     },
+    getContextYear() {
+      let year = localStorage.getItem('agromap.context.year')
+      if (year){
+        this.context.year = +year
+      } else {
+        this.context.year = (new Date).getFullYear()
+        localStorage.setItem('agromap.context.year', this.context.year)
+      }
+    },
     getContextOrganization() {
       let organization = localStorage.getItem('agromap.context.organization')
       this.loading = true
@@ -160,9 +178,10 @@ export default {
           this.context.organization = +organization
         } else {
           this.context.organization = data[0].id
-          localStorage.setItem('agromap.context.organization', data[0].id)
+          localStorage.setItem('agromap.context.organization', this.context.organization)
         }
-        this.loading = false
+        this.getContextField()
+        this.getEntities()
       })
     },
     getContextBudget() {
@@ -173,12 +192,33 @@ export default {
           this.context.budget = +budget
         } else {
           this.context.budget = data[0].id
-          localStorage.setItem('agromap.context.budget', data[0].id)
+          localStorage.setItem('agromap.context.budget', this.context.budget)
         }
       })
     },
-    getData() {
-      http.get(`/fields/${context.organization}`).then(data => { this.fields = data })
+    getContextField() {
+      let field = localStorage.getItem('agromap.context.field')
+      http.get(`/fields/${this.context.organization}`).then(data => {
+        this.fields = data;
+        if (field){
+          this.context.field = +field
+        } else {
+          this.context.field = data[0].id
+          localStorage.setItem('agromap.context.field', this.context.field)
+        }
+        this.loading = false
+      })
+    },
+    removeContextField() {
+      localStorage.removeItem('agromap.context.field')
+      this.getContextField()
+    },
+    getEntities() {
+
+    },
+    clearCache() {
+      localStorage.clear()
+      window.location.reload()
     }
   },
 }
