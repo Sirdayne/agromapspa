@@ -5,23 +5,59 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
-    organizationId: null,
+    year: null,
+    organization: null,
+    budget: null,
+    field: null,
   },
   getters: {
-    getOrganizationId: (state) => {
-      return state.organizationId;
+    getOrganization: (state) => {
+      return state.organization;
+    },
+    getYear: (state) => {
+      return state.year;
+    },
+    getBudget: (state) => {
+      return state.budget;
+    },
+    getField: (state) => {
+      return state.field;
     },
   },
   mutations: {
-    setOrganizationId: (state, payload) => {
-      state.organizationId = payload;
+    setOrganization: (state, payload) => {
+      state.organization = payload;
+    },
+    setYear: (state, payload) => {
+      state.year = payload;
+    },
+    setBudget: (state, payload) => {
+      state.budget = payload;
+    },
+    setField: (state, payload) => {
+      state.field = payload;
     },
   },
   actions: {
-    actionSetOrganizationId: ({
+    actionSetOrganization: ({
       commit
     }, payload) => {
-      commit('setOrganizationId', payload);
+      commit('setOrganization', payload);
+    },
+    actionSetYear: ({
+      commit
+    }, payload) => {
+      commit('setYear', payload);
+    },
+    actionSetBudget: ({
+      commit
+    }, payload) => {
+      commit('setBudget', payload);
+    },
+    actionSetField: ({
+      commit
+    }, payload) => {
+      commit('setField', payload);
     },
   },
   modules: {

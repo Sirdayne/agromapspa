@@ -1,5 +1,5 @@
 <template lang="pug">
-  #app(v-loading="loading")
+  #app(v-loading="loadingContexts")
     #app-container(v-if="logged")
       topmenu
       sidebar(:class="{ 'active' : showSideBar }")
@@ -41,7 +41,7 @@
           el-button(size="small", type="primary", @click="userLogout()") выйти
 
       .overlay-dark(:class="{ 'active' : showSideBar || showSecondBar}", @click="closeSideBars()")
-      router-view
+      router-view(v-if="!loadingContexts")
     #login(v-else)
       .login-img
         img(src="@/assets/logo.png")
@@ -86,7 +86,7 @@ export default {
         field: null,
         budget: null,
       },
-      loading: false,
+      loadingContexts: false,
     }
   },
   created() {
@@ -104,16 +104,20 @@ export default {
   watch: {
     ['context.organization'](val, oldVal) {
       localStorage.setItem('agromap.context.organization', val)
+      this.$store.dispatch('actionSetOrganization', val)
       this.removeContextField()
     },
     ['context.budget'](val, oldVal) {
       localStorage.setItem('agromap.context.budget', val)
+      this.$store.dispatch('actionSetBudget', val)
     },
     ['context.field'](val, oldVal) {
       localStorage.setItem('agromap.context.field', val)
+      this.$store.dispatch('actionSetField', val)
     },
     ['context.year'](val, oldVal) {
       localStorage.setItem('agromap.context.year', val)
+      this.$store.dispatch('actionSetYear', val)
     },
   },
   computed: {
@@ -121,9 +125,6 @@ export default {
       let year = (new Date).getFullYear();
       let years = [year - 4, year - 3, year - 2, year - 1, year, year + 1, year + 2]
       return years
-    },
-    orgId() {
-      return this.$store.getters.getOrganizationId
     },
   },
   methods: {
@@ -167,11 +168,12 @@ export default {
       } else {
         this.context.year = (new Date).getFullYear()
         localStorage.setItem('agromap.context.year', this.context.year)
+        this.$store.dispatch('actionSetYear', this.context.year)
       }
     },
     getContextOrganization() {
       let organization = localStorage.getItem('agromap.context.organization')
-      this.loading = true
+      this.loadingContexts = true
       http.get('/userorganizations').then(data => {
         this.userorganizations = data;
         if (organization){
@@ -179,6 +181,7 @@ export default {
         } else {
           this.context.organization = data[0].id
           localStorage.setItem('agromap.context.organization', this.context.organization)
+          this.$store.dispatch('actionSetOrganization', this.context.organization)
         }
         this.getContextField()
         this.getEntities()
@@ -193,6 +196,7 @@ export default {
         } else {
           this.context.budget = data[0].id
           localStorage.setItem('agromap.context.budget', this.context.budget)
+          this.$store.dispatch('actionSetBudget', this.context.budget)
         }
       })
     },
@@ -205,8 +209,9 @@ export default {
         } else {
           this.context.field = data[0].id
           localStorage.setItem('agromap.context.field', this.context.field)
+          this.$store.dispatch('actionSetField', this.context.field)
         }
-        this.loading = false
+        this.loadingContexts = false
       })
     },
     removeContextField() {
