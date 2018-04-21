@@ -1,5 +1,5 @@
 <template lang="pug">
-  #app
+  #app(v-loading="loading")
     #app-container(v-if="logged")
       topmenu
       sidebar(:class="{ 'active' : showSideBar }")
@@ -22,13 +22,15 @@
               :label="year",
               :value="year")
           el-form-item
-            el-select(v-model="context.organization", clearable, filterable, placeholder="Организация")
-              el-option(v-for="org in userorganizations",
-              :key="org.id",
-              :label="org.name",
-              :value="org.id")
+            el-select(v-model="context.organization", placeholder="Организация")
+              el-option(
+                v-for="org in userorganizations",
+                :label="org.name",
+                :value="org.id",
+                :key="org.id"
+              )
           el-form-item
-            el-select(v-model="context.budget", clearable, filterable, placeholder="Бюджет")
+            el-select(v-model="context.budget", placeholder="Бюджет")
               el-option(v-for="budget in budgets",
               :key="budget.id",
               :label="budget.name",
@@ -83,6 +85,7 @@ export default {
         field: null,
         budget: null,
       },
+      loading: false,
     }
   },
   created() {
@@ -150,30 +153,29 @@ export default {
     },
     getContextOrganization() {
       let organization = localStorage.getItem('agromap.context.organization')
+      this.loading = true
       http.get('/userorganizations').then(data => {
         this.userorganizations = data;
-        if (data && !organization){
+        if (organization){
+          this.context.organization = +organization
+        } else {
           this.context.organization = data[0].id
           localStorage.setItem('agromap.context.organization', data[0].id)
         }
-      })
-      if (organization) {
-        this.context.organization = organization
         this.loading = false
-      }
+      })
     },
     getContextBudget() {
       let budget = localStorage.getItem('agromap.context.budget')
       http.get('/budgets').then(data => {
         this.budgets = data;
-        if (data && !budget){
+        if (budget){
+          this.context.budget = +budget
+        } else {
           this.context.budget = data[0].id
           localStorage.setItem('agromap.context.budget', data[0].id)
         }
       })
-      if (budget) {
-        this.context.budget = budget
-      }
     },
     getData() {
       http.get(`/fields/${context.organization}`).then(data => { this.fields = data })
