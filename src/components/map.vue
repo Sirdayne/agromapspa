@@ -10,8 +10,12 @@ import 'leaflet/dist/leaflet.css'
 
 import {EventBus} from '@/services/EventBus'
 import http from '@/services/httpQuery.js'
+import cacheLoader from '@/mixins/cacheLoader.js'
 
 export default {
+  mixins: [
+    cacheLoader
+  ],
   data () {
     return {
       map: null,
@@ -30,7 +34,7 @@ export default {
   },
   methods: {
     getLeafletFields() {
-      let leafletFields = http.getCache(`leafletFields/${this.organization}`)
+      let leafletFields = this.getCache(`leafletFields/${this.organization}`)
       if (leafletFields) {
         this.leafletFields = leafletFields
         this.drawFields()
@@ -42,7 +46,7 @@ export default {
       http.get(`/leafletFields/${this.organization}`).then(data => {
         if (data) {
           this.leafletFields = data
-          http.setCache(`leafletFields/${this.organization}`, data)
+          this.setCache(`leafletFields/${this.organization}`, data)
           this.drawFields()
         }
       })
@@ -57,7 +61,8 @@ export default {
     _addLayers() {
       let attribution = 'AgroStream';
       let osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: attribution});
-      let satellite = L.tileLayer.provider('Esri.WorldImagery', {attribution: attribution});
+      let satellite = L.
+      tileLayer.provider('Esri.WorldImagery', {attribution: attribution});
       let baseLayers = { "Спутник": satellite, "OpenStreetMaps": osm};
       this.map = L.map('map', {editable: true, layers: [osm]}).setView([53.2858, 69.4466], 11);
       L.control.layers(baseLayers).addTo(this.map);
