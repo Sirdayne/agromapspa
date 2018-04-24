@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { Message } from 'element-ui';
 
+const BASE_URL = `http://agroplanapi-test.azurewebsites.net/`
+
 let apiToken = axios.create({
-  baseURL: 'http://agroplanapi-test.azurewebsites.net/',
+  baseURL: BASE_URL,
   timeout: 180000,
   responseType: 'json',
   headers: {
@@ -11,7 +13,7 @@ let apiToken = axios.create({
 });
 
 let api = axios.create({
-  baseURL: 'http://agroplanapi-test.azurewebsites.net/api/',
+  baseURL: BASE_URL + 'api/',
   timeout: 180000,
   responseType: 'json',
   headers: {

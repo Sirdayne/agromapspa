@@ -14,24 +14,35 @@ export default {
 
   },
   methods: {
-    getEntity(path){
-      let data = this.getCache(path)
-      if (data) {
-        return data
-      } else {
-        http.get(path).then(res => {
-          this.setCache(path, res)
-          return res
-        })
+    fetchEntities(array, callback){
+      let counter = 0
+      array.forEach(path => {
+        let data = this.fromCache(path)
+        if (data) {
+          counter++
+          return data
+        } else {
+          http.get(path).then(res => {
+            this.toCache(path, res)
+            counter++
+            this.checkCounter(counter, array.length, callback)
+          })
+        }
+      })
+      this.checkCounter(counter, array.length, callback)
+    },
+    checkCounter(counter, length, callback){
+      if (counter == length){
+        callback()
       }
     },
-    getCache(path) {
+    fromCache(path) {
       let entity = this.pathLS + path
       return JSON.parse(localStorage.getItem(entity))
     },
-    setCache(path, data) {
+    toCache(path, data) {
       let entity = this.pathLS + path
-      return localStorage.setItem(entity, JSON.stringify(data))
+      localStorage.setItem(entity, JSON.stringify(data))
     },
   }
 }

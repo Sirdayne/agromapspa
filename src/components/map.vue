@@ -30,26 +30,17 @@ export default {
   },
   mounted(){
     this.initMap()
-    this.getLeafletFields()
+    this.fetchEntities([
+      `leafletFields/${this.organization}`,
+      'fields/2',
+      'fields/3',
+      'fields/4',
+    ], this.afterFetch )
   },
   methods: {
-    getLeafletFields() {
-      let leafletFields = this.getCache(`leafletFields/${this.organization}`)
-      if (leafletFields) {
-        this.leafletFields = leafletFields
-        this.drawFields()
-      } else {
-        this.getRemote()
-      }
-    },
-    getRemote() {
-      http.get(`/leafletFields/${this.organization}`).then(data => {
-        if (data) {
-          this.leafletFields = data
-          this.setCache(`leafletFields/${this.organization}`, data)
-          this.drawFields()
-        }
-      })
+    afterFetch() {
+      this.leafletFields = this.fromCache(`leafletFields/${this.organization}`)
+      this.drawFields()
     },
     initMap() {
       this.drawMap()
